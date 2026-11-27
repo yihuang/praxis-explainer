@@ -31,6 +31,9 @@ jobs:
       - name: Smoke-test the built pages
         run: node scripts/verify.mjs
 
+      - name: Test the toy crypto
+        run: node scripts/test-toy.mjs
+
       - name: Assemble the site
         run: |
           touch dist/.nojekyll

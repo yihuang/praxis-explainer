@@ -921,10 +921,14 @@ return { Praxis, tests, SMALL, BIG };`;
         '　　　　(Ψα)<sup>r̂</sup> = Λα ⟺ αψ·r̂ ≡ α(〈T,W〉 − κ) ⟺ r̂ = r(w)<br>'+
         '取回：〈T,W〉 − ψ·r̂ ≡ '+((eT-ePsi*sumR)%Q+Q)%Q+' = κ　⟹　Λ ÷ Ψ<sup>r̂</sup> = g<sup>κ</sup> = [κ]</div>';
       /* ---------- 判定 ---------- */
-      if(d.r!==null){
+      if(d.r!==null && ok){
         vEl.className='hitbox on';
-        vEl.innerHTML='<b>w = (1,'+c[0]+','+c[1]+','+c[2]+')</b> '+(ok?'✓ 是见证':'✗ 不是见证')+'　'+
-          (d.msg===CT.msg?'✓ 解出来的消息和原文一致':'（撞上了一个巧合）');
+        vEl.innerHTML='<b>w = (1,'+c[0]+','+c[1]+','+c[2]+')</b> ✓ 是见证　✓ 解出来的消息和原文一致';
+      }else if(d.r!==null){
+        // 非见证：r̂ 落在搜索窗口里纯属巧合，概率约 (窗口大小)/q
+        vEl.className='hitbox';
+        vEl.innerHTML='<b>w = (1,'+c[0]+','+c[1]+','+c[2]+')</b> ✗ 不是见证　'+
+          '<b>但这次搜索碰巧撞上了</b>——概率约 41/'+Q+'，换一组随机数（重新加密）就露馅。';
       }else{
         vEl.className='hitbox';
         vEl.innerHTML='<b>w = (1,'+c[0]+','+c[1]+','+c[2]+')</b> ✗ 不是见证　组合出来是噪声，搜不到 r̂';

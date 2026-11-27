@@ -921,10 +921,14 @@ return { Praxis, tests, SMALL, BIG };`;
         '　　　　(Ψα)<sup>r̂</sup> = Λα ⟺ αψ·r̂ ≡ α(〈T,W〉 − κ) ⟺ r̂ = r(w)<br>'+
         'Recover: 〈T,W〉 − ψ·r̂ ≡ '+((eT-ePsi*sumR)%Q+Q)%Q+' = κ　⟹　Λ ÷ Ψ<sup>r̂</sup> = g<sup>κ</sup> = [κ]</div>';
       /* ---------- 判定 ---------- */
-      if(d.r!==null){
+      if(d.r!==null && ok){
         vEl.className='hitbox on';
-        vEl.innerHTML='<b>w = (1,'+c[0]+','+c[1]+','+c[2]+')</b> '+(ok?'✓ is a witness':'✗ not a witness')+'　'+
-          (d.msg===CT.msg?'✓ the decrypted message matches the original':'(hit a coincidence)');
+        vEl.innerHTML='<b>w = (1,'+c[0]+','+c[1]+','+c[2]+')</b> ✓ is a witness　✓ the decrypted message matches the original';
+      }else if(d.r!==null){
+        // a non-witness whose r̂ landed in the search window by chance, ~41/q
+        vEl.className='hitbox';
+        vEl.innerHTML='<b>w = (1,'+c[0]+','+c[1]+','+c[2]+')</b> ✗ not a witness　'+
+          '<b>but the search happened to hit</b> — odds about 41/'+Q+'. Draw a fresh set (re-encrypt) and it falls apart.';
       }else{
         vEl.className='hitbox';
         vEl.innerHTML='<b>w = (1,'+c[0]+','+c[1]+','+c[2]+')</b> ✗ not a witness　what comes out is noise, r̂ is never found';

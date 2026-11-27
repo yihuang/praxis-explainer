@@ -43,14 +43,21 @@ disk with no network at all.
 ## Build
 
 ```sh
-node scripts/build.mjs     # or: npm run build
-node scripts/verify.mjs    # or: npm run verify  (builds nothing; run after build)
+npm run build      # dist/index.html, dist/en/index.html
+npm run verify     # smoke test on the built pages (build first)
+npm test           # the workbench's toy crypto
+npm run check      # all three, in order
 open dist/index.html
 ```
 
 `verify.mjs` asserts, for both pages: the inline script still parses
 (`node --check`), the scene / step / cue tables are intact, nothing is loaded
 from the network, and `praxis.txt` is valid UTF-8.
+
+`test-toy.mjs` pulls the toy Praxis out of the workbench source and runs it:
+witness counts (1 / 2 / 5 / 8 as the copy claims), every witness decrypting and
+recovering `[κ]`, both language modules behaving identically, and the
+false-accept rate for non-witnesses staying near its 41/q budget.
 
 ## Deployment
 
