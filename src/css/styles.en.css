@@ -1,0 +1,4 @@
+/* English edition overrides — the shared sheet assumes a CJK-first stack. */
+body,#player .cap,.hero p,.prose p,.prose li{font-family:-apple-system,"Helvetica Neue","Inter",system-ui,"PingFang SC",sans-serif}
+.ip{font-family:-apple-system,"Helvetica Neue",system-ui,sans-serif}
+figure::before{content:"↔  swipe sideways"}

@@ -1,0 +1,14 @@
+{
+  "name": "praxis-explainer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A visual explainer of witness encryption, built from one shared engine and two content packs",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "verify": "node scripts/verify.mjs",
+    "check": "node scripts/build.mjs && node scripts/verify.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

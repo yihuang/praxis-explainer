@@ -3,14 +3,14 @@
 // They are single self-contained files: if the script block still parses, the
 // cue table is intact and nothing is fetched from the network, the page works.
 
-import { readFileSync, writeFileSync, mkdtempSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const PAGES = [
-  { file: 'praxis-explainer.html',    lang: 'zh-CN', marker: '演算台', pill: 'href="en/"' },
-  { file: 'praxis-explainer-en.html', lang: 'en',    marker: 'workbench', pill: 'href="../"' },
+  { file: 'dist/index.html',    lang: 'zh-CN', marker: '演算台', pill: 'href="en/"' },
+  { file: 'dist/en/index.html', lang: 'en',    marker: 'workbench', pill: 'href="../"' },
 ];
 const CUES = 45, SCENES = 10, STEPS = 12;
 
@@ -24,6 +24,11 @@ const tmp = mkdtempSync(join(tmpdir(), 'praxis-verify-'));
 
 for (const page of PAGES) {
   console.log(`\n${page.file}`);
+  if (!existsSync(page.file)) {
+    console.error('  FAIL  missing — run `npm run build` first');
+    failures++;
+    continue;
+  }
   const html = readFileSync(page.file, 'utf8');
 
   // 1. size — a truncated file is the most likely breakage
@@ -63,7 +68,7 @@ for (const page of PAGES) {
     bad('no inline <script> block found');
   } else {
     const js = html.slice(first + '<script>'.length, last);
-    const file = join(tmp, `${page.file}.js`);
+    const file = join(tmp, page.file.replace(/[\\/]/g, '_') + '.js');
     writeFileSync(file, js);
     try {
       execFileSync(process.execPath, ['--check', file], { stdio: 'pipe' });

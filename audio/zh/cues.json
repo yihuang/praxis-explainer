@@ -1,0 +1,272 @@
+[
+ {
+  "scene": 0,
+  "index": 0,
+  "file": "00-00.m4a",
+  "d": 3.24
+ },
+ {
+  "scene": 0,
+  "index": 1,
+  "file": "00-01.m4a",
+  "d": 4.2
+ },
+ {
+  "scene": 0,
+  "index": 2,
+  "file": "00-02.m4a",
+  "d": 4.68
+ },
+ {
+  "scene": 0,
+  "index": 3,
+  "file": "00-03.m4a",
+  "d": 2.88
+ },
+ {
+  "scene": 0,
+  "index": 4,
+  "file": "00-04.m4a",
+  "d": 4.68
+ },
+ {
+  "scene": 1,
+  "index": 0,
+  "file": "01-00.m4a",
+  "d": 4.08
+ },
+ {
+  "scene": 1,
+  "index": 1,
+  "file": "01-01.m4a",
+  "d": 4.48
+ },
+ {
+  "scene": 1,
+  "index": 2,
+  "file": "01-02.m4a",
+  "d": 3.64
+ },
+ {
+  "scene": 1,
+  "index": 3,
+  "file": "01-03.m4a",
+  "d": 3.16
+ },
+ {
+  "scene": 2,
+  "index": 0,
+  "file": "02-00.m4a",
+  "d": 4.64
+ },
+ {
+  "scene": 2,
+  "index": 1,
+  "file": "02-01.m4a",
+  "d": 5.48
+ },
+ {
+  "scene": 2,
+  "index": 2,
+  "file": "02-02.m4a",
+  "d": 3.4
+ },
+ {
+  "scene": 2,
+  "index": 3,
+  "file": "02-03.m4a",
+  "d": 4.6
+ },
+ {
+  "scene": 2,
+  "index": 4,
+  "file": "02-04.m4a",
+  "d": 3.44
+ },
+ {
+  "scene": 3,
+  "index": 0,
+  "file": "03-00.m4a",
+  "d": 5.72
+ },
+ {
+  "scene": 3,
+  "index": 1,
+  "file": "03-01.m4a",
+  "d": 3.88
+ },
+ {
+  "scene": 3,
+  "index": 2,
+  "file": "03-02.m4a",
+  "d": 4.36
+ },
+ {
+  "scene": 3,
+  "index": 3,
+  "file": "03-03.m4a",
+  "d": 4.88
+ },
+ {
+  "scene": 3,
+  "index": 4,
+  "file": "03-04.m4a",
+  "d": 2.08
+ },
+ {
+  "scene": 4,
+  "index": 0,
+  "file": "04-00.m4a",
+  "d": 4.56
+ },
+ {
+  "scene": 4,
+  "index": 1,
+  "file": "04-01.m4a",
+  "d": 4.24
+ },
+ {
+  "scene": 4,
+  "index": 2,
+  "file": "04-02.m4a",
+  "d": 2.6
+ },
+ {
+  "scene": 4,
+  "index": 3,
+  "file": "04-03.m4a",
+  "d": 5.2
+ },
+ {
+  "scene": 4,
+  "index": 4,
+  "file": "04-04.m4a",
+  "d": 2.24
+ },
+ {
+  "scene": 5,
+  "index": 0,
+  "file": "05-00.m4a",
+  "d": 4.76
+ },
+ {
+  "scene": 5,
+  "index": 1,
+  "file": "05-01.m4a",
+  "d": 3.44
+ },
+ {
+  "scene": 5,
+  "index": 2,
+  "file": "05-02.m4a",
+  "d": 3.2
+ },
+ {
+  "scene": 5,
+  "index": 3,
+  "file": "05-03.m4a",
+  "d": 4.0
+ },
+ {
+  "scene": 6,
+  "index": 0,
+  "file": "06-00.m4a",
+  "d": 3.8
+ },
+ {
+  "scene": 6,
+  "index": 1,
+  "file": "06-01.m4a",
+  "d": 3.92
+ },
+ {
+  "scene": 6,
+  "index": 2,
+  "file": "06-02.m4a",
+  "d": 4.84
+ },
+ {
+  "scene": 6,
+  "index": 3,
+  "file": "06-03.m4a",
+  "d": 5.0
+ },
+ {
+  "scene": 6,
+  "index": 4,
+  "file": "06-04.m4a",
+  "d": 3.76
+ },
+ {
+  "scene": 7,
+  "index": 0,
+  "file": "07-00.m4a",
+  "d": 3.36
+ },
+ {
+  "scene": 7,
+  "index": 1,
+  "file": "07-01.m4a",
+  "d": 4.76
+ },
+ {
+  "scene": 7,
+  "index": 2,
+  "file": "07-02.m4a",
+  "d": 3.12
+ },
+ {
+  "scene": 7,
+  "index": 3,
+  "file": "07-03.m4a",
+  "d": 4.12
+ },
+ {
+  "scene": 8,
+  "index": 0,
+  "file": "08-00.m4a",
+  "d": 2.36
+ },
+ {
+  "scene": 8,
+  "index": 1,
+  "file": "08-01.m4a",
+  "d": 4.96
+ },
+ {
+  "scene": 8,
+  "index": 2,
+  "file": "08-02.m4a",
+  "d": 3.32
+ },
+ {
+  "scene": 8,
+  "index": 3,
+  "file": "08-03.m4a",
+  "d": 2.88
+ },
+ {
+  "scene": 9,
+  "index": 0,
+  "file": "09-00.m4a",
+  "d": 2.68
+ },
+ {
+  "scene": 9,
+  "index": 1,
+  "file": "09-01.m4a",
+  "d": 4.32
+ },
+ {
+  "scene": 9,
+  "index": 2,
+  "file": "09-02.m4a",
+  "d": 3.44
+ },
+ {
+  "scene": 9,
+  "index": 3,
+  "file": "09-03.m4a",
+  "d": 3.04
+ }
+]

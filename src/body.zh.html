@@ -1,0 +1,329 @@
+<a class="langpill" href="en/" title="English edition">EN</a>
+<div id="prog"></div>
+
+<!-- ============================ HERO ============================ -->
+<header class="hero">
+  <div class="kicker">图解 · Praxis 2026</div>
+  <h1>把秘密<br>锁进一道<em style="font-style:normal;color:#F0AC5F">题</em>里</h1>
+  <p class="sub">如果加密不需要钥匙，而是加密给一个「条件」——谁能让这个条件成立，谁就能读到——世界会变成什么样？十三年来，这个想法一直是「理论上成立、工程上荒谬」。Praxis 把它从「物理上不可能」挪到了「笔记本上几秒」。</p>
+  <div class="actions">
+    <button class="btn" id="play">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5v11l9-5.5z"/></svg>
+      播放讲解 · 约 3 分钟
+    </button>
+    <a class="btn ghost" href="#s1" style="border-bottom:0">向下滚动阅读 · 10 幕 + 演算台</a>
+  </div>
+  <div class="meta">
+    依据 <b>Praxis: Practical Witness Encryption for NP</b>（David Tse, Nikhil Vanjani, Psi Vesely, 2026）<br>
+    所有数字均取自论文正文与表格；动画为示意，不按比例。<br>
+    <a href="#lab" style="border-bottom:1px dashed rgba(240,172,95,.5);color:#F0AC5F">想直接验算？跳到演算台 →</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================ 0 ============================ -->
+<section class="scene" id="s1" data-title="加密给一道题">
+  <div class="num">第一幕</div>
+  <h2>加密给一道题，而不是给一个人</h2>
+  <div class="prose">
+    <p class="lead">今天所有的加密，背后都有一把钥匙。你要么把钥匙交给对方，要么自己留着。无论如何，总得有某个东西被传递、被保管、被信任。</p>
+    <p>2013 年，Garg、Gentry、Sahai 和 Waters 提出一种奇怪的加密：<strong>不要钥匙</strong>。把消息锁进一个命题里，命题长这样——</p>
+    <p style="text-align:center;margin:26px 0"><code style="font-size:16px;background:none;border:0;color:#dbe2ef">“存在一个 w，使得程序 P 在输入 w 时输出 1”</code></p>
+    <p>这样的 w 在理论计算机科学里叫 <em>见证</em>（witness）。规则简单到近乎粗暴：</p>
+    <ul>
+      <li>手里有这个 w 的人，<span class="b">能解开</span>；</li>
+      <li>没有的人，即使拿到密文、全部公开参数、和全世界的算力，也<span class="r">读不出一个比特</span>。</li>
+    </ul>
+    <p>它被称为<strong>见证加密</strong>（witness encryption）。密文自带「释放条件」，没有密钥分发，也没有任何一方被信任去释放消息。</p>
+    <p>想象一封写给未来的信：寄出之后，寄信人死了，服务器关停了，公司破产了——只要这封信的条件仍然可以被满足，它就在那儿等着那个能给出答案的人。这不是比喻，是这项技术的字面功能。</p>
+  </div>
+  <figure>
+    <canvas data-i="0"></canvas>
+    <figcaption><b>图 1</b>　锁不是一把钥匙，而是一道题。左下方的点代表任意输入；只有携带见证的那一个能穿过检验，其余在这里变成噪声。</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 1 ============================ -->
+<section class="scene" id="s2" data-title="三角困境">
+  <div class="num">第二幕</div>
+  <h2>一个卡了十三年的三角形</h2>
+  <div class="prose">
+    <p class="lead">一项密码方案要被真正使用，需要三个愿望同时成立。</p>
+    <ul>
+      <li><strong>通用</strong>：能加密给任意 NP 命题——图灵机、智能合约、一段 Rust 程序，而不只是某个特定格式。</li>
+      <li><strong>可证明</strong>：安全性写在某种被广泛接受的模型与假设上，而不是「暂时没人攻破」。</li>
+      <li><strong>实用</strong>：密文尺寸、加密与解密时间，是可讨论的数字。</li>
+    </ul>
+    <p>十三年里，所有已知方案最多占住其中两条边：</p>
+    <p><strong>通用 + 可证明</strong>——来自不可区分混淆（iO），来自线性码的某个假设，来自 Hair 与 Sahai 2026 年的「秩间隙」定理。它们都是<em>可行性结论</em>：数学上存在，工程上天文数字。</p>
+    <p><strong>可证明 + 实用</strong>——只覆盖很窄的关系：对签名的见证加密、对 KZG 承诺打开的见证加密。安全，但不够通用。</p>
+    <p><strong>通用 + 实用</strong>——依赖启发式论证或量身定做的假设。其中相当一部分已经被攻破，或者被证明可以绕过见证直接解密。</p>
+    <p>Praxis 的野心，是站到三角形中间去，而且第一次三条同时为真。</p>
+  </div>
+  <figure>
+    <canvas data-i="1"></canvas>
+    <figcaption><b>图 2</b>　三角形三条边都有住户，中心一直空着。此图按论文 §1.3 的「相关工作」梳理归类。</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 2 ============================ -->
+<section class="scene" id="s3" data-title="秩">
+  <div class="num">第三幕</div>
+  <h2>核心机关：把「解方程」变成「矩阵的秩」</h2>
+  <div class="prose">
+    <p class="lead">这是全篇论文的心脏。慢一点。</p>
+    <p>任何一个 NP 命题，都可以写成一堆<strong>布尔未知数上的二次方程</strong>。取 N 个 0/1 未知数 <code>w₁…w_N</code>，再固定 <code>w₀ = 1</code>，于是每个约束都是「两个线性式相乘等于第三个线性式」——这叫 R1CS，零知识证明领域的通用语言。</p>
+    <p>现在做一个动作：把向量 w 变成一个<strong>矩阵</strong>。</p>
+    <p style="text-align:center;margin:24px 0"><code style="font-size:17px;background:none;border:0;color:#dbe2ef">W = w · wᵀ</code>　　（第 (i, j) 项就是 <code style="background:none;border:0">w_i w_j</code>）</p>
+    <p>这叫<em>矩量矩阵</em>。它看起来只是把乘积堆起来，但它在做一件神奇的事：<strong>任何二次式 a(w)·b(w)，都能写成 ⟨C, W⟩ 这种「对 W 的线性组合」</strong>，其中 C 是公开矩阵。</p>
+    <p>于是整个命题被翻译成一句话：</p>
+    <p style="text-align:center;margin:24px 0;color:#dbe2ef">「w 满足所有约束」　⟺　「W 通过所有<b>线性</b>测试」</p>
+    <p>而真正的见证给出的 W = wwᵀ，<strong>秩恰好是 1</strong>：每一行都是 w 的倍数，或干脆是零。</p>
+    <p>麻烦恰恰在这里。测试是线性的，所以「通过的矩阵」构成一个<em>线性空间</em>——它里面混进了不是见证的东西，论文称之为 <strong>cheat</strong>（骗子）。最温和的一个例子：两个赋值 u 和 u′ 各自都差一点，但在每个约束上的误差一正一负，取平均 <code>(uuᵀ + u′u′ᵀ)/2</code>，误差互相抵消，所有测试都过——而它的秩是 2。</p>
+    <p>整篇论文，本质上都在管理这个秩。<em>下面那个演算台里，这四步都有具体的数字。</em></p>
+  </div>
+  <figure>
+    <canvas data-i="2"></canvas>
+    <figcaption><b>图 3</b>　左：见证的矩阵秩为 1，每一行相同。右：两个赋值的平均——测试全过，秩却是 2。秩，就是「它有多少个真实的自由度」。</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 3 ============================ -->
+<section class="scene" id="s4" data-title="藏进指数">
+  <div class="num">第四幕</div>
+  <h2>把它藏进指数里</h2>
+  <div class="prose">
+    <p class="lead">有了「秩」这个把手，下一步是把它变成加密。手法是密码学里最古老的一招：把值放进去群元素的指数里。</p>
+    <p>取一个素数阶 q 的群 𝔾，把 <code>v·g</code> 记作 <code>[v]</code>。你拿到一堆 <code>[T_ij]</code>，可以按任意系数把<strong>它们加起来</strong>——群运算你做得到——却看不到里面到底是什么值。你可以组合，不能偷看。</p>
+    <p>加密者取一个隐藏向量 y、一个隐藏的「小整数」向量 r、一个测试掩码 M，再把钥匙 κ 塞进表的角落，拼出一张表：</p>
+    <p style="text-align:center;margin:24px 0"><code style="font-size:16px;background:none;border:0;color:#dbe2ef">T = ½(y rᵀ + r yᵀ) + M + κ·e₀e₀ᵀ</code></p>
+    <p>密文里发布每一个 <code>[T_ij]</code>。任何人——包括完全不知道见证的人——都可以<em>沿着任意矩阵 W</em> 把这些条目加权组合起来，得到一个群元素：</p>
+    <p style="text-align:center;margin:24px 0;color:#dbe2ef">⟨T, W⟩ = yᵀWr + ⟨M, W⟩ + κ·W₀₀</p>
+    <p>三项各有分工：</p>
+    <ul>
+      <li><strong>第三项是钥匙</strong>。见证的矩阵角落 W₀₀ = w₀² = 1，所以这一项就等于 κ。</li>
+      <li><strong>第二项是保安</strong>。W 通过所有测试则整项为 0；不通过，就是一个均匀随机的标量——整条组合瞬间化为噪声。</li>
+      <li><strong>第一项是锁</strong>。它挡在钥匙前面，而它是唯一一个只有「猜」才能拆掉的东西。</li>
+    </ul>
+    <p>注意这一招的优雅之处：<strong>没有人需要知道见证就能加密</strong>，加密者甚至不需要知道这道题有没有解。他只是照着公开的测试，造一张谁都读不懂、但可以被正确的人正确组合的表。</p>
+    <p style="font-size:15px;color:#8e97ab;padding:14px 16px;background:rgba(88,196,221,.04);border-radius:10px;border:1px solid rgba(88,196,221,.12)">
+      具体到数字？在<a href="#lab">演算台</a>里，这张表的角落是 <code>T₀₀ = 75 + 100 + 13 = 188 ≡ 87</code>（mod 101）——三块拼起来，一格就成了。</p>
+  </div>
+  <figure>
+    <canvas data-i="3"></canvas>
+    <figcaption><b>图 4</b>　上：表由三项相加而成，逐条发布为群元素。下：沿任意 W 组合——通过测试的人拿到「钥匙 + 一道锁」，没通过的人拿到噪声。</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 4 ============================ -->
+<section class="scene" id="s5" data-title="一个整数">
+  <div class="num">第五幕</div>
+  <h2>那道锁，其实只是一个整数</h2>
+  <div class="prose">
+    <p class="lead">见证者手里的情形，会奇迹般地塌缩。</p>
+    <p>代入 W = wwᵀ，第一项变成 <code>yᵀ(wwᵀ)r = (y·w)(r·w) = ψ · r(w)</code>。这里 ψ = y(w) 它自己能算——它知道 w，密文里有全部 [y_i]。但 <code>r(w) = Σ w_i r_i</code> 是一个整数，它落在某个已知区间里，却不知道是哪一个。</p>
+    <p>于是解密变成了一件事：<strong>找出一个整数</strong>。</p>
+    <p>这个整数的区间有多宽？每个 r_i 在 <code>[0, g)</code> 里独立取值，r(w) 是其中「命中 w 非零位」的那些之和——最坏情况区间宽度是 N·g。如果只能一个一个试，那就是一场噩梦。</p>
+    <p>但你可以两边一起试。从中心 c_w 出发向外做小步大步搜索（baby-step giant-step）：先铺一张 √ 大小的小步表，再迈大步跳过去。找到它的代价，大约是</p>
+    <p style="text-align:center;margin:24px 0"><code style="font-size:16px;background:none;border:0;color:#dbe2ef">O( √|r(w) − c_w| )　≈　O( 2^(λ/4) · N^(1/4) )</code></p>
+    <p>这就是论文里那个「指数级、但具体地讲很短」的搜索。<strong>λ = 100 时</strong>：范围 g ≈ 2<sup>50.6</sup>，但搜索只需约 <strong>2<sup>29.4</sup></strong> 次步进——几亿次，每次 6 次域乘法。一台笔记本，几秒钟。</p>
+    <p style="font-size:15.5px;color:#8e97ab;border-left:2px solid rgba(240,172,95,.4);padding-left:14px">
+      这一整套（表、组合、还原、搜索）在<a href="#lab" style="border-bottom:1px dashed rgba(240,172,95,.5);color:#F0AC5F">演算台</a>里用 𝔽₁₀₁ 的具体数字从头走一遍，每一步都能自己验算。</p>
+    <p>而区间之所以能这么窄，正是因为未知数被限制成布尔值。<span class="b">「每个数只能是 0 或 1」这个约束，是让搜索变短的技术前提</span>——这就是为什么整个方案坚持要先写成布尔二次系统。</p>
+  </div>
+  <figure>
+    <canvas data-i="4"></canvas>
+    <figcaption><b>图 5</b>　2<sup>50</sup> 宽的区间，用 √ 的代价穿过去。蓝色是预先铺好的小步，金色是从中心向外跳的大步；两者相遇的地方就是答案。</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 演算台 ============================ -->
+<section class="scene" id="lab" data-title="演算台">
+  <div class="num">演算台</div>
+  <h2>十二步，把加密从头造一遍</h2>
+  <div class="prose">
+    <p class="lead">前面几幕讲的是机制。这一节是账本：同一个玩具实例，从一行代码一路算到解开。</p>
+    <div class="aside" style="border-left-color:rgba(88,196,221,.55);background:linear-gradient(90deg,rgba(88,196,221,.06),transparent 72%);margin-top:18px">
+      <b>先说清楚这份账本的出处。</b>掩码 + 搜索项 + 有界搜索，是 2026 年 Hair–Sahai 那篇可行性结果里的「秩模板」，Praxis 只是换了一种更整齐的写法；角落里放钥匙、α 副本，是 Praxis 加的。
+      而 Praxis 真正的主菜——用 QAP 把表因子化、绑定副本、共享因子——是第七幕那四步，它们把 10⁴³ GiB 压到 7.88 GiB。这一节造到模板为止，因为再往后就要用上多项式与配对了。
+    </div>
+    <p>把域从 <code>q ≈ 2²⁵³·⁶</code> 换成 <code>𝔽₁₀₁</code>，把 39 万个未知数换成 4 个——<strong>公式一个字都不改</strong>。选 101 的唯一理由，是让所有中间结果都能落在纸上。</p>
+    <p>写代码的人都熟悉这种感觉：一个东西如果你不能<b>从零实现一遍</b>，就不算真懂。所以这里不引用任何结论，每一步都从上一行推出来，每个数字都能按定义验算。</p>
+  </div>
+  <div class="lab">
+    <div class="lab-tabs" id="labTabs"></div>
+    <div class="lab-view" id="labView"></div>
+    <div class="lab-foot">
+      <button id="labPrev">← 上一步</button>
+      <button id="labNext">下一步 →</button>
+      <span class="lab-count" id="labCount"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 5 ============================ -->
+<section class="scene" id="s6" data-title="秩决定猜几个数">
+  <div class="num">第六幕</div>
+  <h2>秩，决定你必须同时猜中几个数</h2>
+  <div class="prose">
+    <p class="lead">现在考虑对手。它当然不老老实实沿 wwᵀ 组合，它可以沿任何通过测试的矩阵 W 组合。</p>
+    <p>如果 W 的秩是 d，那么 <code>W = Σ u_ℓ v_ℓᵀ</code>，于是</p>
+    <p style="text-align:center;margin:24px 0;color:#dbe2ef">yᵀWr = Σ (yᵀu_ℓ)(v_ℓᵀr)</p>
+    <p>裂成了 d 个乘积之和，每个乘数都独立随机，<strong>它们不会互相抵消</strong>。要拆掉这道锁，唯一办法是一次同时猜中 d 个整数。猜中的概率最多是 g<sup>−d</sup>。</p>
+    <p>于是整个设计的杠杆出现了：</p>
+    <ul>
+      <li>我们要让「最容易猜的骗子」的秩尽量高，比如 <strong>d = 4</strong>。那样范围只需 <code>g⁴ ≈ 2^(2λ)</code>，即 <code>g ≈ 2^(λ/2)</code>。</li>
+      <li>而诚实解密只需要猜 <strong>1 个</strong>数，代价是 <code>√g ≈ 2^(λ/4)</code>。</li>
+    </ul>
+    <p>诚实的和作弊的，各自面对一个<em>不同的 d</em>：一个只需猜 1 个数，一个必须猜 4 个。这就是为什么 g 可以开到 2<sup>λ/2</sup> 这么大——对诚实者，它只是一次 √ 的搜索；对骗子，它是 g⁴ 分之一的运气。</p>
+    <p>那么怎么把最小秩抬到 4？——复制这张表若干份，每份乘上一个关于 w 的多项式权重，再用隐藏的线性恒等式把副本们「绑」在一起。只重复而不绑定是没用的：骗子可以在每一份里复制同一个作弊矩阵。</p>
+  </div>
+  <figure>
+    <canvas data-i="5"></canvas>
+    <figcaption><b>图 6</b>　上：诚实者只需猜 1 个数，骗子必须同时猜 4 个。下：把 d 从 2 抬到 4 的三步，搜索成本（100 比特安全，域乘法次数）随之下降。</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 6 ============================ -->
+<section class="scene" id="s7" data-title="四步手术">
+  <div class="num">第七幕</div>
+  <h2>四步手术：把 10⁴³ 变成 8 GiB</h2>
+  <div class="prose">
+    <p class="lead">Hair 与 Sahai 的构造证明了秩间隙可行。但在最优点上，给 100 比特的密钥加密，它的密文要 <strong>1.1 × 10¹¹ GiB</strong>——不是慢，是物理上不可能。</p>
+    <p>Praxis 没有靠「更好的常数」，它做了四次<em>结构性</em>改动。论文用一张表记录了每一步的代价：</p>
+    <ul>
+      <li><strong>① 只留一张表。</strong>不再费力把秩抬高，而是把秩间隙固定在 1 比 2，反过来把范围 g 放大到 2<sup>λ</sup>。尺寸与加密变成多项式，代价是搜索变成指数——但指数也可以具体地很短。密文：<strong>4.6 × 10⁴³ GiB</strong>。</li>
+      <li><strong>② 让表变成两个因子。</strong>原本「测试掩码 + 钥匙」那一块可以换成一个 QAP 的项 <code>A(τ)B(τ)ᵀ</code>，秩为 1。配上双线性配对，表变成两个宽度为 2 的因子相乘，密文从 N² 个元素塌成 4(N+1) 个。密文：<strong>0.14 GiB</strong>。</li>
+      <li><strong>③ 绑定副本。</strong>为了把最小秩从 2 抬到 4，复制多份并用多项式权重加权的代价是 λ² 倍体积。密文：<strong>8.1 × 10² GiB</strong>。</li>
+      <li><strong>④ 共享因子。</strong>这些副本彼此只差一个标量！把它们排成网格，同一行、同一列共享同一个因子。密文：<strong>7.88 GiB</strong>。</li>
+    </ul>
+    <p>真正的艺术是第三步到第四步：<strong>把「秩」和「尺寸」这两个本来死死绑在一起的东西松开</strong>，让它们各自付各自的账。</p>
+  </div>
+  <figure>
+    <canvas data-i="6"></canvas>
+    <figcaption><b>图 7</b>　论文表 2 的四个阶段，横轴为对数刻度。第 2 步是一次「降维」，第 3 步为了安全把体积又买回来，第 4 步用共享结构折价收回。</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 7 ============================ -->
+<section class="scene" id="s8" data-title="数字">
+  <div class="num">第八幕</div>
+  <h2>同一道题，同一安全等级</h2>
+  <div class="prose">
+    <p class="lead">把这些放进具体场景：加密到 BN254 上的一个 Groth16 验证器，100 比特安全。加密的是 100 比特密钥。</p>
+    <p><strong>密文 7.88 GiB。</strong>对照 Hair–Sahai 基本构造的 1.1 × 10¹¹ GiB，差了十个数量级以上。</p>
+    <p><strong>加密约 2<sup>34.2</sup> 次域乘法</strong>（约 2 × 10¹⁰），笔记本上几秒。对方是 2.6 × 10²⁰。</p>
+    <p><strong>解密（有证明时）约 2<sup>33.0</sup></strong>（约 8.6 × 10⁹），其中一半多在搜索上。对方是 1.2 × 10¹⁶，差六个数量级。</p>
+    <p>内存：加密峰值约 12 GB，解密约 5 GB，密文可以流式处理，不必整体装进内存。</p>
+    <p>交付的不是「只能加密 100 比特」的东西：解密恢复出一个群元素，用随机预言机从它导出<strong>任意长度</strong>的密钥，剩下的交给对称加密。这在密码学里叫<span class="b">见证密钥封装</span>（WKEM）。</p>
+    <div class="aside">别忘了那些没变的：7.88 GiB 依然很大；加密依然要几秒钟；而「几秒钟」是相对于「不可能」而言的胜利，不是相对于「像 HTTPS 一样快」。</div>
+  </div>
+  <figure>
+    <canvas data-i="7"></canvas>
+    <figcaption><b>图 8</b>　同样一道语句、同样 100 比特安全。下方细线是同一把对数标尺（10⁰–10²⁰），点的间距即数量级之差：十个、十个、六个。</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 8 ============================ -->
+<section class="scene" id="s9" data-title="信任">
+  <div class="num">第九幕</div>
+  <h2>凭什么相信它</h2>
+  <div class="prose">
+    <p class="lead">密码学论文里最该被追问的一句话是：「你的证明，假设了什么？」</p>
+    <p>Praxis 的抽取性（extractability）在<strong>双线性通用群模型 + 随机预言机模型</strong>下证明，并归约到 <strong>Module-SIS</strong> 这个格问题。这两类理想化模型在配对密码学里是被广泛接受的标准工具——不是「我们假设它安全因为没人攻破」，而是「在这个模型里，任何对手都逃不掉」。</p>
+    <p>具体参数按<em>最佳已知攻击</em>标定：BN254 的目标群上离散对数约 2¹⁰³，Module-SIS 实例约 2¹⁰³·⁵。论文还老实交代了归约的损失——为了让证明本身给出 100 比特，格实例大约还需要再硬 4.5 比特。</p>
+    <p>更少见的是：他们把<strong>正确性</strong>与<strong>抽取性</strong>在 Lean 4 里形式化证明了，就在真实参数下，只依赖三条标准的经典逻辑公理。机器检查过，不是人眼看过。</p>
+    <p>然后是一条必须讲清楚的边界：</p>
+  </div>
+  <div class="aside" style="border-left-color:rgba(252,98,85,.6);background:linear-gradient(90deg,rgba(252,98,85,.07),transparent 70%)">
+    <b>诚实初始化假设。</b>方案加密到一个 Groth16 验证器，而 Groth16 需要一个 setup。谁保留了 setup 的陷阱门（trapdoor），谁就能为任何公开输入伪造证明——也就解开了用这把钥匙加密的<strong>全部</strong>密文。这不是实现瑕疵，是这类构造的结构性前提。
+  </div>
+  <figure>
+    <canvas data-i="8"></canvas>
+    <figcaption><b>图 9</b>　三层假设撑起定理，再加一份机器检查的证明；下面那条红线，是它必须付出的代价。</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 9 ============================ -->
+<section class="scene" id="s10" data-title="意义">
+  <div class="num">第十幕</div>
+  <h2>这意味着什么，以及它不是什么</h2>
+  <div class="prose">
+    <p class="lead">通用性不是修辞。因为加密到一个「通用论证」的验证器，一条固定的密钥可以服务<strong>所有</strong>关系，代价对所有关系都一样。</p>
+    <p>你可以把一段 Rust 程序编译进零知识虚拟机，把它的执行证明收进 Groth16。于是「我知道一个能让这段程序接受的输入」就成了见证。<strong>你可以给未来的人写一封信，条件是他能给出某段代码的输入。</strong></p>
+    <p>它也不是什么，这一点同样重要：</p>
+    <ul>
+      <li>不是「量子安全」的银弹——BN254 上的配对不抗量子；</li>
+      <li>不是一个零知识证明系统——它不产生证明，只保证「没有见证就读不出明文」；</li>
+      <li>不是「轻量级」——7.88 GiB 的密文做不了日常通信。</li>
+    </ul>
+    <p>它的意义在别处：十三年里，「通用 + 可证明 + 算得动」第一次同时为真。这条路不再是一个纯存在性定理，它有了<strong>可以继续优化的具体形状</strong>——QAP 加配对，加格的绑定，加一个聪明的搜索。</p>
+    <p>数学最迷人的时刻，往往是它先告诉你「存在」，再告诉你「长什么样」。</p>
+  </div>
+  <figure>
+    <canvas data-i="9"></canvas>
+    <figcaption><b>图 10</b>　从 2013 年的定义，到 2026 年的可行性，再到可以上笔记本的 7.88 GiB。中间那一步没有缩短，它只是被绕过去了。</figcaption>
+  </figure>
+</section>
+
+</main>
+
+<footer>
+  <h3>术语小抄</h3>
+  <table>
+    <tr><th>词</th><th>意思</th></tr>
+    <tr><td>witness</td><td>见证。让命题成立的输入，例如让程序输出 1 的那组参数。</td></tr>
+    <tr><td>R1CS / BQS</td><td>秩一约束系统 / 布尔二次系统。把 NP 关系写成「两个线性式相乘等于第三个」的方程组，未知数取 0/1。</td></tr>
+    <tr><td>矩量矩阵</td><td>W = wwᵀ。第 (i,j) 项是 w_i w_j，于是所有二次式都变成对 W 的线性函数。</td></tr>
+    <tr><td>cheat</td><td>骗子。通过所有线性测试、却不由任何见证产生的矩阵。它的秩至少是 2。</td></tr>
+    <tr><td>秩间隙</td><td>见证给出秩 1，骗子至少给出秩 d。这个差就是安全性的度量。</td></tr>
+    <tr><td>QAP</td><td>二次算术程序。用多项式把「所有约束同时成立」压缩成一个可除性检查。</td></tr>
+    <tr><td>配对</td><td>双线性映射 e([a]₁,[b]₂)=[ab]_T。它让「两个因子相乘」可以在密文里完成。</td></tr>
+    <tr><td>Module-SIS</td><td>格上的短向量问题。用来阻止对手把多份表绑定关系破开。</td></tr>
+    <tr><td>通用群模型</td><td>只允许群运算、看不到元素表示的理想化模型。比标准模型强，比「无 model」弱。</td></tr>
+  </table>
+
+  <h3>关键数字</h3>
+  <table>
+    <tr><th>量</th><th>值（λ = 100）</th></tr>
+    <tr><td>未知数 N</td><td class="n">391,693 ≈ 2<sup>18.6</sup></td></tr>
+    <tr><td>域阶 q</td><td class="n">≈ 2<sup>253.6</sup>（BN254）</td></tr>
+    <tr><td>秘密整数范围 g</td><td class="n">1,736,375,024,658,487 ≈ 2<sup>50.6</sup></td></tr>
+    <tr><td>密文</td><td class="n">7.88 GiB</td></tr>
+    <tr><td>加密（域乘法）</td><td class="n">2<sup>34.2</sup> ≈ 2.0 × 10<sup>10</sup></td></tr>
+    <tr><td>解密（期望）</td><td class="n">2<sup>33.0</sup> ≈ 8.6 × 10<sup>9</sup></td></tr>
+    <tr><td>搜索步进（期望）</td><td class="n">2<sup>29.4</sup></td></tr>
+    <tr><td>内存峰值</td><td class="n">加密 ≈ 12 GB / 解密 ≈ 5 GB</td></tr>
+    <tr><td>对照：Hair–Sahai 基本构造</td><td class="n">1.1 × 10<sup>11</sup> GiB</td></tr>
+  </table>
+
+  <p class="colophon">
+    本页是科普解读，不是论文的替代品。所有技术断言、参数与数字均来自原文；动画为示意性图解，刻意省略了大量细节（扩域权重、MSIS 绑定的具体形式、抽取性证明的结构）。
+    原文：<em>Praxis: Practical Witness Encryption for NP</em>, David Tse, Nikhil Vanjani, Psi Vesely, 2026.
+    前置工作：I. M. Hair, A. Sahai, <em>Witness Encryption via Prime-Order Generic Groups</em>,
+    <a href="https://arxiv.org/abs/2609.18275" target="_blank" rel="noopener">arXiv:2609.18275</a>.
+    形式化：<a href="https://github.com/psivesely/praxis-lean" target="_blank" rel="noopener">github.com/psivesely/praxis-lean</a>. 早期概念：<a href="https://eprint.iacr.org/2013/258" target="_blank" rel="noopener">GGSW13</a>（Witness Encryption, ePrint 2013/258).
+    旁白由 macOS 内置语音合成（<span class="mono">say -v Tingting</span>）生成并内嵌为 m4a，字幕、语音与画面共用同一条时间轴。
+  </p>
+</footer>
+
+<nav id="dots"></nav>
+
+<!-- ============================ PLAYER ============================ -->
+<div id="player">
+  <audio id="va" preload="auto"></audio>
+  <div class="hint">空格 播放/暂停 · ← → 切幕 · Esc 退出 · 有声音</div>
+  <button class="ibtn x" id="xclose" title="退出">✕</button>
+  <div class="stage"><canvas id="pcv"></canvas></div>
+  <div class="capbox"><p id="cap"></p></div>
+  <div class="bar">
+    <button class="ibtn" id="pprev" title="上一幕">‹</button>
+    <button class="ibtn" id="pplay" title="播放">▶</button>
+    <button class="ibtn" id="pnext" title="下一幕">›</button>
+    <button class="ibtn" id="pmute" title="声音"><svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 6h2.2L8.5 3.5v9L5.2 10H3z"/><path d="M11 5.6a3.2 3.2 0 010 4.8"/></svg></button>
+    <div class="track" id="track"><div class="fill" id="fill"></div></div>
+    <div class="time" id="ptime">0:00 / 0:00</div>
+  </div>
+</div>
+

@@ -1,0 +1,328 @@
+<a class="langpill" href="../" title="中文版">中文</a>
+<div id="prog"></div>
+
+<!-- ============================ HERO ============================ -->
+<header class="hero">
+  <div class="kicker">Illustrated · Praxis 2026</div>
+  <h1>Lock a secret<br>inside a <em style="font-style:normal;color:#F0AC5F">problem</em></h1>
+  <p class="sub">If encryption needed no key, but was instead made to a "condition" — whoever can make that condition hold can read it — what would the world look like? For thirteen years, the idea has been "sound in theory, absurd in engineering." Praxis moved it from "physically impossible" to "a few seconds on a laptop."</p>
+  <div class="actions">
+    <button class="btn" id="play">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5v11l9-5.5z"/></svg>
+      Play the explainer · about 3½ minutes
+    </button>
+    <a class="btn ghost" href="#s1" style="border-bottom:0">Scroll down to read · 10 acts + workbench</a>
+  </div>
+  <div class="meta">
+    Based on <b>Praxis: Practical Witness Encryption for NP</b> (David Tse, Nikhil Vanjani, Psi Vesely, 2026)<br>
+    All numbers are taken from the paper's body text and tables; the animations are illustrative and not to scale.<br>
+    <a href="#lab" style="border-bottom:1px dashed rgba(240,172,95,.5);color:#F0AC5F">Want to check it yourself? Jump to the workbench →</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================ 0 ============================ -->
+<section class="scene" id="s1" data-title="Encrypting to a problem">
+  <div class="num">Act I</div>
+  <h2>Encrypt to a problem, not to a person</h2>
+  <div class="prose">
+    <p class="lead">Every encryption in use today has a key behind it. Either you hand the key to the other party, or you keep it yourself. Either way, something has to be transmitted, stored, and trusted.</p>
+    <p>In 2013, Garg, Gentry, Sahai, and Waters proposed a strange kind of encryption: <strong>no key</strong>. Lock the message inside a statement, and the statement looks like this—</p>
+    <p style="text-align:center;margin:26px 0"><code style="font-size:16px;background:none;border:0;color:#dbe2ef">“there exists a w such that program P outputs 1 on input w”</code></p>
+    <p>Such a w is called a <em>witness</em> in theoretical computer science. The rule is simple to the point of brutality:</p>
+    <ul>
+      <li>whoever holds this w <span class="b">can open it</span>;</li>
+      <li>whoever does not — even with the ciphertext, all the public parameters, and all the computing power in the world — <span class="r">cannot read a single bit</span>.</li>
+    </ul>
+    <p>It is called <strong>witness encryption</strong>. The ciphertext carries its own "release condition"; there is no key distribution, and no party is trusted to release the message.</p>
+    <p>Imagine a letter addressed to the future: once it is sent, the sender dies, the server shuts down, the company goes bankrupt — as long as the letter's condition can still be satisfied, it sits there, waiting for whoever can produce the answer. This is not a metaphor; it is the literal function of the technique.</p>
+  </div>
+  <figure>
+    <canvas data-i="0"></canvas>
+    <figcaption><b>Figure 1</b>　The lock is not a key but a problem. The points at lower left are arbitrary inputs; only the one carrying the witness gets through the check, and the rest become noise here.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 1 ============================ -->
+<section class="scene" id="s2" data-title="The triangle">
+  <div class="num">Act II</div>
+  <h2>A triangle stuck for thirteen years</h2>
+  <div class="prose">
+    <p class="lead">For a cryptographic scheme to be really used, three wishes have to come true at once.</p>
+    <ul>
+      <li><strong>General</strong>: it can encrypt to an arbitrary NP statement — a Turing machine, a smart contract, a piece of Rust code — not just one particular format.</li>
+      <li><strong>Provable</strong>: security rests on some widely accepted model and assumption, not on "nobody has broken it yet."</li>
+      <li><strong>Practical</strong>: ciphertext size, encryption time, and decryption time are numbers you can discuss.</li>
+    </ul>
+    <p>For thirteen years, every known scheme has held at most two of those edges:</p>
+    <p><strong>General + provable</strong> — from indistinguishability obfuscation (iO), from some assumption about linear codes, from Hair and Sahai's 2026 "rank gap" theorem. These are all <em>feasibility results</em>: they exist mathematically, and are astronomical in engineering.</p>
+    <p><strong>Provable + practical</strong> — they cover only very narrow relations: witness encryption for signatures, witness encryption for openings of KZG commitments. Secure, but not general enough.</p>
+    <p><strong>General + practical</strong> — resting on heuristic arguments or assumptions made to measure. A good part of these have already been broken, or shown to allow decryption that bypasses the witness outright.</p>
+    <p>Praxis's ambition is to stand in the middle of the triangle and, for the first time, have all three be true at once.</p>
+  </div>
+  <figure>
+    <canvas data-i="1"></canvas>
+    <figcaption><b>Figure 2</b>　All three edges of the triangle have occupants; the center has always been empty. This figure sorts and classifies them according to "Related Work" in §1.3 of the paper.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 2 ============================ -->
+<section class="scene" id="s3" data-title="Rank">
+  <div class="num">Act III</div>
+  <h2>The core mechanism: turn "solving equations" into "the rank of a matrix"</h2>
+  <div class="prose">
+    <p class="lead">This is the heart of the whole paper. Go slowly.</p>
+    <p>Any NP statement can be written as a pile of <strong>quadratic equations over Boolean unknowns</strong>. Take N unknowns that are 0 or 1, <code>w₁…w_N</code>, then fix <code>w₀ = 1</code>, and every constraint becomes "two linear forms multiplied together equal a third linear form" — this is called R1CS, the common language of the zero-knowledge world.</p>
+    <p>Now make one move: turn the vector w into a <strong>matrix</strong>.</p>
+    <p style="text-align:center;margin:24px 0"><code style="font-size:17px;background:none;border:0;color:#dbe2ef">W = w · wᵀ</code>　　(the (i, j) entry is just <code style="background:none;border:0">w_i w_j</code>)</p>
+    <p>This is called the <em>moment matrix</em>. It looks like nothing but products piled up, yet it does something remarkable: <strong>any quadratic form a(w)·b(w) can be written as ⟨C, W⟩, a "linear combination of W"</strong>, where C is a public matrix.</p>
+    <p>So the whole statement is translated into one sentence:</p>
+    <p style="text-align:center;margin:24px 0;color:#dbe2ef">"w satisfies all constraints"　⟺　"W passes all <b>linear</b> tests"</p>
+    <p>And the W that a genuine witness gives, W = wwᵀ, <strong>has rank exactly 1</strong>: every row is a multiple of w, or else plain zero.</p>
+    <p>The trouble is exactly here. The tests are linear, so "the matrices that pass" form a <em>linear space</em> — and things that are not witnesses get mixed into it. The paper calls them <strong>cheat</strong>. The mildest example: two assignments u and u′ each fall a little short, but their errors on each constraint have opposite signs; average them, <code>(uuᵀ + u′u′ᵀ)/2</code>, the errors cancel, every test passes — and its rank is 2.</p>
+    <p>The whole paper is, in essence, about managing this rank. <em>In the workbench below, all four of these steps come with concrete numbers.</em></p>
+  </div>
+  <figure>
+    <canvas data-i="2"></canvas>
+    <figcaption><b>Figure 3</b>　Left: the witness matrix has rank 1, and every row is the same. Right: the average of two assignments — every test passes, yet the rank is 2. Rank is "how many real degrees of freedom it has."</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 3 ============================ -->
+<section class="scene" id="s4" data-title="Hidden in the exponent">
+  <div class="num">Act IV</div>
+  <h2>Hide it in the exponent</h2>
+  <div class="prose">
+    <p class="lead">Once rank gives you a handle, the next step is to turn it into encryption. The trick is the oldest one in cryptography: put the value into the exponent of a group element.</p>
+    <p>Take a group 𝔾 of prime order q and write <code>v·g</code> as <code>[v]</code>. You are handed a pile of <code>[T_ij]</code>, and you can <strong>add them up</strong> with any coefficients you like — group operations are yours to perform — yet you cannot see what values are inside. You can combine; you cannot peek.</p>
+    <p>The encryptor picks a hidden vector y, a hidden vector r of small integers, and a test mask M, then stuffs the key κ into the corner of the table and assembles one:</p>
+    <p style="text-align:center;margin:24px 0"><code style="font-size:16px;background:none;border:0;color:#dbe2ef">T = ½(y rᵀ + r yᵀ) + M + κ·e₀e₀ᵀ</code></p>
+    <p>The ciphertext publishes every <code>[T_ij]</code>. Anyone — including someone with no idea what the witness is — can weight-combine those entries <em>along an arbitrary matrix W</em> and obtain a group element:</p>
+    <p style="text-align:center;margin:24px 0;color:#dbe2ef">⟨T, W⟩ = yᵀWr + ⟨M, W⟩ + κ·W₀₀</p>
+    <p>Each of the three terms has a job:</p>
+    <ul>
+      <li><strong>The third term is the key</strong>. At the witness's matrix corner W₀₀ = w₀² = 1, so this term is exactly κ.</li>
+      <li><strong>The second term is the guard</strong>. If W passes every test, the whole term is 0. If not, it is a uniformly random scalar — and the entire combination collapses into noise on the spot.</li>
+      <li><strong>The first term is the lock</strong>. It stands in front of the key, and it is the one thing that nothing but guessing can take apart.</li>
+    </ul>
+    <p>Note the elegance of the trick: <strong>nobody needs to know the witness in order to encrypt</strong>. The encryptor need not even know whether the problem has a solution. He merely follows the public tests and builds a table that no one can read, but that the right person can combine correctly.</p>
+    <p style="font-size:15px;color:#8e97ab;padding:14px 16px;background:rgba(88,196,221,.04);border-radius:10px;border:1px solid rgba(88,196,221,.12)">
+      Concretely? In the <a href="#lab">workbench</a>, the corner of this table is <code>T₀₀ = 75 + 100 + 13 = 188 ≡ 87</code> (mod 101) — three pieces added together, and one cell is done.</p>
+  </div>
+  <figure>
+    <canvas data-i="3"></canvas>
+    <figcaption><b>Figure 4</b>　Top: the table is three terms summed, each entry published as a group element. Bottom: combining along an arbitrary W — those who pass the tests get the key plus one lock, those who fail get noise.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 4 ============================ -->
+<section class="scene" id="s5" data-title="One integer">
+  <div class="num">Act V</div>
+  <h2>That lock is really just one integer</h2>
+  <div class="prose">
+    <p class="lead">In the witness's hands, the picture collapses, almost miraculously.</p>
+    <p>Substitute W = wwᵀ and the first term becomes <code>yᵀ(wwᵀ)r = (y·w)(r·w) = ψ · r(w)</code>. Here ψ = y(w) is something the witness can compute for itself — it knows w, and the ciphertext holds every [y_i]. But <code>r(w) = Σ w_i r_i</code> is an integer: it sits somewhere inside a known interval, and the witness does not know where.</p>
+    <p>So decryption reduces to one task: <strong>find an integer</strong>.</p>
+    <p>How wide is the interval? Each r_i takes its value in <code>[0, g)</code> independently, and r(w) is the sum of those r_i whose index i is a nonzero position of w — worst case the interval is N·g wide. Try it one value at a time and you are in for a nightmare.</p>
+    <p>But you can search in two directions at once. Starting at the center c_w, run a baby-step giant-step search outward: first lay down a table of √ baby steps, then leap across in giant steps. The cost of finding it is roughly</p>
+    <p style="text-align:center;margin:24px 0"><code style="font-size:16px;background:none;border:0;color:#dbe2ef">O( √|r(w) − c_w| )　≈　O( 2^(λ/4) · N^(1/4) )</code></p>
+    <p>This is the search the paper calls exponential but concretely short. <strong>At λ = 100</strong>: the range is g ≈ 2<sup>50.6</sup>, yet the search needs only about <strong>2<sup>29.4</sup></strong> steps — a few hundred million, at 6 field multiplications each. One laptop, a few seconds.</p>
+    <p style="font-size:15.5px;color:#8e97ab;border-left:2px solid rgba(240,172,95,.4);padding-left:14px">
+      The whole pipeline — table, combination, recovery, search — is walked through from scratch in the <a href="#lab" style="border-bottom:1px dashed rgba(240,172,95,.5);color:#F0AC5F">workbench</a> with concrete 𝔽₁₀₁ numbers, and every step can be checked by hand.</p>
+    <p>And the interval is that narrow only because the unknowns are restricted to Boolean values. <span class="b">The constraint that every number must be 0 or 1 is the technical precondition that makes the search short</span> — which is why the whole scheme insists on writing the relation as a Boolean quadratic system first.</p>
+  </div>
+  <figure>
+    <canvas data-i="4"></canvas>
+    <figcaption><b>Figure 5</b>　An interval 2<sup>50</sup> wide, crossed at √ cost. Blue are the baby steps laid down in advance, gold are the giant steps leaping outward from the center; where the two meet is the answer.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 演算台 ============================ -->
+<section class="scene" id="lab" data-title="Workbench">
+  <div class="num">Workbench</div>
+  <h2>Twelve steps, building the encryption from scratch</h2>
+  <div class="prose">
+    <p class="lead">The previous acts described the mechanism. This section is the ledger: one toy instance, computed all the way from a line of code to recovery.</p>
+    <div class="aside" style="border-left-color:rgba(88,196,221,.55);background:linear-gradient(90deg,rgba(88,196,221,.06),transparent 72%);margin-top:18px">
+      <b>First, where this ledger comes from.</b> The mask plus a search term plus a bounded search is the rank template from the 2026 Hair–Sahai feasibility result; Praxis merely rewrites it more tidily. Putting the key in the corner, and the α copies, are Praxis's additions.
+      And Praxis's real main course — factoring the table with a QAP, binding the copies, sharing factors — is the four steps of Act VII, the ones that squeeze 10⁴³ GiB down to 7.88 GiB. This section builds up to the template and stops there, because past that point you need polynomials and pairings.
+    </div>
+    <p>Swap the field from <code>q ≈ 2²⁵³·⁶</code> to <code>𝔽₁₀₁</code>, swap 390,000 unknowns for 4 — <strong>and not one character of the formulas changes</strong>. The only reason to choose 101 is to keep every intermediate result small enough to write on paper.</p>
+    <p>Anyone who writes code knows the feeling: if you cannot <b>implement a thing from scratch</b>, you do not really understand it. So nothing here is quoted as a conclusion. Every step is derived from the line above it, and every number can be checked against its definition.</p>
+  </div>
+  <div class="lab">
+    <div class="lab-tabs" id="labTabs"></div>
+    <div class="lab-view" id="labView"></div>
+    <div class="lab-foot">
+      <button id="labPrev">← Previous step</button>
+      <button id="labNext">Next step →</button>
+      <span class="lab-count" id="labCount"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 5 ============================ -->
+<section class="scene" id="s6" data-title="Rank sets the guesses">
+  <div class="num">Act VI</div>
+  <h2>Rank decides how many numbers you must guess at once</h2>
+  <div class="prose">
+    <p class="lead">Now consider the adversary. It will not politely combine along wwᵀ; it can combine along any matrix W that passes the tests.</p>
+    <p>If W has rank d, then <code>W = Σ u_ℓ v_ℓᵀ</code>, so</p>
+    <p style="text-align:center;margin:24px 0;color:#dbe2ef">yᵀWr = Σ (yᵀu_ℓ)(v_ℓᵀr)</p>
+    <p>It splits into a sum of d products, every factor independent and random, and <strong>they do not cancel one another</strong>. The only way to break the lock is to guess d integers correctly all at once. The chance of that is at most g<sup>−d</sup>.</p>
+    <p>And there is the lever the whole design turns on:</p>
+    <ul>
+      <li>We want the easiest-to-guess cheat to have the highest possible rank, say <strong>d = 4</strong>. Then the range need only be <code>g⁴ ≈ 2^(2λ)</code>, that is, <code>g ≈ 2^(λ/2)</code>.</li>
+      <li>Honest decryption still guesses only <strong>1</strong> number, at a cost of <code>√g ≈ 2^(λ/4)</code>.</li>
+    </ul>
+    <p>The honest and the cheating party each face a <em>different d</em>: one need guess 1 number, the other must guess 4. That is why g can be as large as 2<sup>λ/2</sup> — for the honest party it is one √ search, for the cheat it is a one-in-g⁴ stroke of luck.</p>
+    <p>So how do you lift the minimum rank to 4? Copy the table several times, weight each copy by a polynomial in w, then bind the copies together with hidden linear identities. Repetition without binding is useless: the cheat can plant the same cheating matrix in every copy.</p>
+  </div>
+  <figure>
+    <canvas data-i="5"></canvas>
+    <figcaption><b>Figure 6</b>　Top: the honest party guesses 1 number, the cheat must guess 4 at once. Bottom: the three steps that raise d from 2 to 4, and the search cost (100-bit security, counted in field multiplications) falling with them.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 6 ============================ -->
+<section class="scene" id="s7" data-title="Four surgical steps">
+  <div class="num">Act VII</div>
+  <h2>Four Surgical Steps: From 10⁴³ to 8 GiB</h2>
+  <div class="prose">
+    <p class="lead">The Hair–Sahai construction proved that a rank gap is possible. But at its optimum, encrypting a 100-bit key yields a ciphertext of <strong>1.1 × 10¹¹ GiB</strong> — not slow, but physically impossible.</p>
+    <p>Praxis did not reach for "better constants". It made four <em>structural</em> changes. The paper records the cost of each step in a single table:</p>
+    <ul>
+      <li><strong>① Keep only one table.</strong> Instead of straining to raise the rank, fix the rank gap at 1 to 2 and enlarge the range g to 2<sup>λ</sup>. Size and encryption become polynomial; the price is that the search becomes exponential — but an exponential that can be concretely very short. Ciphertext: <strong>4.6 × 10⁴³ GiB</strong>.</li>
+      <li><strong>② Split the table into two factors.</strong> The "test mask + key" block can be swapped for a single QAP term <code>A(τ)B(τ)ᵀ</code> of rank 1. With a bilinear pairing, the table becomes two factors of width 2 multiplied together, and the ciphertext collapses from N² elements to 4(N+1). Ciphertext: <strong>0.14 GiB</strong>.</li>
+      <li><strong>③ Bind the copies.</strong> To lift the minimum rank from 2 to 4, replicate the table several times and weight the copies with polynomials; the cost is a factor of λ² in size. Ciphertext: <strong>8.1 × 10² GiB</strong>.</li>
+      <li><strong>④ Share factors.</strong> These copies differ from one another by a single scalar! Lay them out on a grid, and every row and every column shares one factor. Ciphertext: <strong>7.88 GiB</strong>.</li>
+    </ul>
+    <p>The real art is steps three and four: <strong>loosening "rank" and "size", which had been welded together</strong>, so that each pays its own bill.</p>
+  </div>
+  <figure>
+    <canvas data-i="6"></canvas>
+    <figcaption><b>Figure 7</b>　The four stages of Table 2 in the paper; the horizontal axis is logarithmic. Step 2 is a dimensionality reduction; step 3 buys volume back for security; step 4 reclaims it at a discount through shared structure.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 7 ============================ -->
+<section class="scene" id="s8" data-title="The numbers">
+  <div class="num">Act VIII</div>
+  <h2>The Same Problem, the Same Security Level</h2>
+  <div class="prose">
+    <p class="lead">Put these into a concrete setting: encrypt to a Groth16 verifier over BN254, at 100-bit security. What is encrypted is a 100-bit key.</p>
+    <p><strong>A 7.88 GiB ciphertext.</strong> Set against the 1.1 × 10¹¹ GiB of the base Hair–Sahai construction, that is a gap of more than ten orders of magnitude.</p>
+    <p><strong>Encryption takes about 2<sup>34.2</sup> field multiplications</strong> (roughly 2 × 10¹⁰), a few seconds on a laptop. The counterpart figure is 2.6 × 10²⁰.</p>
+    <p><strong>Decryption (with a proof in hand) takes about 2<sup>33.0</sup></strong> (roughly 8.6 × 10⁹), more than half of it in the search. The counterpart figure is 1.2 × 10¹⁶ — six orders of magnitude apart.</p>
+    <p>Memory: a peak of about 12 GB for encryption and about 5 GB for decryption; the ciphertext can be streamed, so it never has to fit in memory whole.</p>
+    <p>What ships is not something that "can only encrypt 100 bits": decryption recovers a group element, a random oracle derives a key of <strong>arbitrary length</strong> from it, and the rest is handed to symmetric encryption. Cryptography calls this <span class="b">witness key encapsulation</span> (WKEM).</p>
+    <div class="aside">Don't forget what did not change: 7.88 GiB is still large; encryption still takes seconds; and "seconds" is a victory over "impossible", not over "as fast as HTTPS".</div>
+  </div>
+  <figure>
+    <canvas data-i="7"></canvas>
+    <figcaption><b>Figure 8</b>　The same statement, the same 100-bit security. The thin rule below is one shared logarithmic scale (10⁰–10²⁰); the spacing between dots is the gap in orders of magnitude: ten, ten, six.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 8 ============================ -->
+<section class="scene" id="s9" data-title="Trust">
+  <div class="num">Act IX</div>
+  <h2>Why Believe It</h2>
+  <div class="prose">
+    <p class="lead">The question a cryptography paper most deserves is: "What does your proof assume?"</p>
+    <p>Praxis proves extractability in the <strong>bilinear generic group model plus the random oracle model</strong>, and reduces it to the lattice problem <strong>Module-SIS</strong>. Both idealised models are standard tools, broadly accepted in pairing cryptography — not "we assume it is secure because nobody has broken it", but "inside this model, no adversary escapes".</p>
+    <p>The concrete parameters are calibrated against the <em>best known attacks</em>: discrete log in the target group of BN254 sits at about 2¹⁰³, the Module-SIS instance at about 2¹⁰³·⁵. The paper is also candid about the loss in the reduction — for the proof itself to deliver 100 bits, the lattice instance has to be roughly another 4.5 bits harder.</p>
+    <p>Rarer still: they formalised <strong>correctness</strong> and <strong>extractability</strong> in Lean 4, at the real parameters, relying only on three standard axioms of classical logic. Machine-checked, not eyeballed.</p>
+    <p>Then comes a boundary that has to be stated plainly:</p>
+  </div>
+  <div class="aside" style="border-left-color:rgba(252,98,85,.6);background:linear-gradient(90deg,rgba(252,98,85,.07),transparent 70%)">
+    <b>The honest-setup assumption.</b> The scheme encrypts to a Groth16 verifier, and Groth16 needs a setup. Whoever keeps the setup's trapdoor can forge a proof for any public input — and thereby open <strong>every</strong> ciphertext encrypted under that key. This is not an implementation flaw; it is a structural precondition of constructions of this kind.
+  </div>
+  <figure>
+    <canvas data-i="8"></canvas>
+    <figcaption><b>Figure 9</b>　Three layers of assumption hold the theorem up, plus a machine-checked proof; the red line below is the price it has to pay.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================ 9 ============================ -->
+<section class="scene" id="s10" data-title="Significance">
+  <div class="num">Act X</div>
+  <h2>What It Means, and What It Does Not</h2>
+  <div class="prose">
+    <p class="lead">Generality is not rhetoric. Because the scheme encrypts to the verifier of a "universal argument", one fixed key can serve <strong>all</strong> relations, at the same cost for every one of them.</p>
+    <p>You can compile a Rust program into a zero-knowledge virtual machine and fold its execution proof into Groth16. "I know an input that makes this program accept" then becomes a witness. <strong>You can write a letter to a future person, on the condition that they can supply an input to some piece of code.</strong></p>
+    <p>What it is not matters just as much:</p>
+    <ul>
+      <li>not a silver bullet for "quantum safety" — pairings over BN254 are not quantum-resistant;</li>
+      <li>not a zero-knowledge proof system — it produces no proofs, it only guarantees that "without a witness you cannot read the plaintext";</li>
+      <li>not "lightweight" — a 7.88 GiB ciphertext is no basis for everyday communication.</li>
+    </ul>
+    <p>Its significance lies elsewhere: for thirteen years, "general + provable + computable" had never been true all at once. The road is no longer a pure existence theorem; it has a <strong>concrete shape that can be optimised further</strong> — QAPs plus pairings, plus a lattice binding, plus a clever search.</p>
+    <p>The most captivating moments in mathematics are often the ones where it first tells you "it exists", and then tells you "what it looks like".</p>
+  </div>
+  <figure>
+    <canvas data-i="9"></canvas>
+    <figcaption><b>Figure 10</b>　From the 2013 definition, to the 2026 feasibility, to 7.88 GiB on a laptop. The middle step was not shortened; it was routed around.</figcaption>
+  </figure>
+</section>
+
+</main>
+
+<footer>
+  <h3>Glossary</h3>
+  <table>
+    <tr><th>Term</th><th>Meaning</th></tr>
+    <tr><td>witness</td><td>witness. The input that makes the statement true — for example the parameters that make the program output 1.</td></tr>
+    <tr><td>R1CS / BQS</td><td>Rank-1 constraint system / Boolean quadratic system. Writing an NP relation as a system of equations of the form "two linear forms multiplied give a third", with the unknowns taking 0/1.</td></tr>
+    <tr><td>moment matrix</td><td>W = wwᵀ. Entry (i,j) is w_i w_j, so every quadratic form becomes a linear function of W.</td></tr>
+    <tr><td>cheat</td><td>cheat. A matrix that passes every linear test yet is produced by no witness. Its rank is at least 2.</td></tr>
+    <tr><td>rank gap</td><td>The witness yields rank 1, a cheat at least rank d. That difference is the measure of security.</td></tr>
+    <tr><td>QAP</td><td>Quadratic arithmetic program. Uses polynomials to compress "all constraints hold at once" into a single divisibility check.</td></tr>
+    <tr><td>pairing</td><td>The bilinear map e([a]₁,[b]₂)=[ab]_T. It lets "multiply two factors" be done inside the ciphertext.</td></tr>
+    <tr><td>Module-SIS</td><td>The short-vector problem on lattices. It keeps an adversary from prising apart the binding between the multiple tables.</td></tr>
+    <tr><td>generic group model</td><td>An idealised model in which only group operations are allowed and the representation of elements is hidden. Stronger than the standard model, weaker than "no model at all".</td></tr>
+  </table>
+
+  <h3>Key Numbers</h3>
+  <table>
+    <tr><th>Quantity</th><th>Value (λ = 100)</th></tr>
+    <tr><td>Unknowns N</td><td class="n">391,693 ≈ 2<sup>18.6</sup></td></tr>
+    <tr><td>Field order q</td><td class="n">≈ 2<sup>253.6</sup> (BN254)</td></tr>
+    <tr><td>Secret integer range g</td><td class="n">1,736,375,024,658,487 ≈ 2<sup>50.6</sup></td></tr>
+    <tr><td>Ciphertext</td><td class="n">7.88 GiB</td></tr>
+    <tr><td>Encryption (field multiplications)</td><td class="n">2<sup>34.2</sup> ≈ 2.0 × 10<sup>10</sup></td></tr>
+    <tr><td>Decryption (expected)</td><td class="n">2<sup>33.0</sup> ≈ 8.6 × 10<sup>9</sup></td></tr>
+    <tr><td>Search steps (expected)</td><td class="n">2<sup>29.4</sup></td></tr>
+    <tr><td>Peak memory</td><td class="n">Encryption ≈ 12 GB / decryption ≈ 5 GB</td></tr>
+    <tr><td>For comparison: base Hair–Sahai construction</td><td class="n">1.1 × 10<sup>11</sup> GiB</td></tr>
+  </table>
+
+  <p class="colophon">
+    This page is an explainer, not a substitute for the paper. Every technical claim, parameter, and number is taken from the original; the animations are schematic diagrams that deliberately omit a great deal of detail (extension-field weights, the exact form of the MSIS binding, the structure of the extractability proof).
+    Original: <em>Praxis: Practical Witness Encryption for NP</em>, David Tse, Nikhil Vanjani, Psi Vesely, 2026.
+    Prior work: I. M. Hair, A. Sahai, <em>Witness Encryption via Prime-Order Generic Groups</em>,
+    <a href="https://arxiv.org/abs/2609.18275" target="_blank" rel="noopener">arXiv:2609.18275</a>.
+    Formalisation: <a href="https://github.com/psivesely/praxis-lean" target="_blank" rel="noopener">github.com/psivesely/praxis-lean</a>. Early concept: <a href="https://eprint.iacr.org/2013/258" target="_blank" rel="noopener">GGSW13</a> (Witness Encryption, ePrint 2013/258).
+    Narration is generated by macOS's built-in speech synthesis (<span class="mono">say -v Tingting</span>) and embedded as m4a; captions, voice, and picture share one timeline.
+  </p>
+</footer>
+
+<nav id="dots"></nav>
+
+<!-- ============================ PLAYER ============================ -->
+<div id="player">
+  <audio id="va" preload="auto"></audio>
+  <div class="hint">Space play/pause · ← → switch act · Esc exit · sound on</div>
+  <button class="ibtn x" id="xclose" title="Exit">✕</button>
+  <div class="stage"><canvas id="pcv"></canvas></div>
+  <div class="capbox"><p id="cap"></p></div>
+  <div class="bar">
+    <button class="ibtn" id="pprev" title="Previous act">‹</button>
+    <button class="ibtn" id="pplay" title="Play">▶</button>
+    <button class="ibtn" id="pnext" title="Next act">›</button>
+    <button class="ibtn" id="pmute" title="Sound"><svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 6h2.2L8.5 3.5v9L5.2 10H3z"/><path d="M11 5.6a3.2 3.2 0 010 4.8"/></svg></button>
+    <div class="track" id="track"><div class="fill" id="fill"></div></div>
+    <div class="time" id="ptime">0:00 / 0:00</div>
+  </div>
+</div>
