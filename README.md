@@ -1,5 +1,7 @@
 # Praxis, explained
 
+**[中文版 →](https://yihuang.github.io/praxis-explainer/)　·　[English edition →](https://yihuang.github.io/praxis-explainer/en/)**
+
 Two self-contained pages that explain **witness encryption** through the Praxis
 construction ([*Praxis: Practical Witness Encryption for NP*](https://arxiv.org/abs/2609.18275),
 Tse–Vanjani–Vesely, 2026): what the problem is, why it stayed open for thirteen
@@ -63,8 +65,8 @@ false-accept rate for non-witnesses staying near its 41/q budget.
 
 Pushes to `main` build and deploy to GitHub Pages:
 
-- `/` → the Chinese edition
-- `/en/` → the English edition
+- <https://yihuang.github.io/praxis-explainer/> — the Chinese edition
+- <https://yihuang.github.io/praxis-explainer/en/> — the English edition
 
 Workflows: `pages.yml` (build → verify → deploy `dist/`) and `ci.yml` (the same
 build and test on every other branch and PR).
